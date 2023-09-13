@@ -1,2 +1,7 @@
+uvicorn==0.23.2
 fastapi==0.103.1
-environ==1.0
+environs==9.5.0
+SQLAlchemy==2.0.20
+pymysql==1.1.0
+bcrypt==4.0.1
+mysql-connector-python==8.1.0
