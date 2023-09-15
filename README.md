@@ -19,6 +19,9 @@ If you have a troubles here, try to run:
 sudo apt install python3-full
 ```
 4. Create `.env` file with `DB_URL`, which depends on your database.
+
+`DB_URL=CONNECTOR://YOUR_USER:PASSWORD@HOST:PORT/postfix`
+
 Change connector, user, password, host, port with your credentials.
 
 Use connector for:
@@ -26,3 +29,8 @@ Use connector for:
 - MariaDB: `mariadb+mariadbconnector`or `mariadb+mariadbconnector`<br>
 You can also use MySQL connector, if you want. Learn more [here.](https://docs.sqlalchemy.org/en/20/dialects/mysql.html)
 - PostgreSQL: `postgresql`
+
+Example for `.env` file:
+```shell
+DB_URL=mysql+mysqlconnector://user:my_password@localhost:3306/postfix
+```
