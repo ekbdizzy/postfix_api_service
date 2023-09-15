@@ -18,11 +18,11 @@ If you have a troubles here, try to run:
 ```shell
 sudo apt install python3-full
 ```
-4. Create `.env` file with following settings:
-```
-DB_USER=root
-DB_PASSWORD=password
-DB_NAME=postfix
-DB_HOST=localhost
-DB_PORT=3306
-```
+4. Create `.env` file with `DB_URL`, which depends on your database.
+Change connector, user, password, host, port with your credentials.
+
+Use connector for:
+- MySQL: `mysql+mysqlconnector`
+- MariaDB: `mariadb+mariadbconnector`or `mariadb+mariadbconnector`<br>
+You can also use MySQL connector, if you want. Learn more [here.](https://docs.sqlalchemy.org/en/20/dialects/mysql.html)
+- PostgreSQL: `postgresql`

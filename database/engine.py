@@ -1,3 +1,5 @@
+import contextlib
+
 from environs import Env
 
 from sqlalchemy import create_engine
@@ -11,6 +13,14 @@ SQLALCHEMY_DATABASE_URL = env.str("DB_URL")
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 Base = declarative_base()
 
-session = sessionmaker()
-session.configure(bind=engine)
-session = session()
+Session = sessionmaker()
+Session.configure(bind=engine)
+
+
+@contextlib.contextmanager
+def db_session():
+    session = Session()
+    try:
+        yield session
+    finally:
+        session.close()
