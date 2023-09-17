@@ -1,4 +1,6 @@
 import bcrypt
+from sqlalchemy.orm import Session
+
 from database.models import Mailbox, Alias
 from database.pydantic_models import MailboxData
 
@@ -34,4 +36,11 @@ def convert_data_to_alias(data: MailboxData, alias: Alias):
     return alias
 
 
-
+def create_mailbox(session: Session, data: MailboxData):
+    """Create a new mailbox."""
+    mailbox = convert_data_to_mailbox(data, Mailbox())
+    alias = convert_data_to_alias(data, Alias())
+    session.add(mailbox)
+    session.add(alias)
+    session.commit()
+    return mailbox

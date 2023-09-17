@@ -1,4 +1,6 @@
 import datetime
+from typing import List
+
 from dateutil.relativedelta import relativedelta
 
 from pydantic import BaseModel
@@ -19,3 +21,6 @@ class MailboxData(BaseModel):
     token_validity: datetime.datetime = datetime.datetime.now()
     password_expiry: datetime.datetime = datetime.datetime.now() + relativedelta(years=10)
 
+
+class MailboxDataList(BaseModel):
+    mailboxes: List[MailboxData]
