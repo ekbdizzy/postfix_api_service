@@ -1,16 +1,29 @@
-from fastapi import FastAPI
+from typing import Annotated
+
+from fastapi import Depends, FastAPI
+from fastapi.security import HTTPBasic,HTTPBasicCredentials
 
 from database.engine import db_session
 from database.models import Mailbox, Alias
 from database.pydantic_models import MailboxData, MailboxDataList
 from utils import mailbox_utils as utils
 
+from settings import Settings
+
+settings = Settings()
 app = FastAPI()
+security = HTTPBasic()
 
 
 @app.get("/")
 def index():
     return {}
+
+
+@app.get("/users/me")
+def read_current_user(credentials: Annotated[HTTPBasicCredentials, Depends(security)]):
+    return {"username": credentials.username, "password": credentials.password}
+
 
 
 @app.get("/mailbox/")
@@ -59,12 +72,19 @@ def delete_mailbox(email: str):
 
 
 @app.get("/mailboxes/{domain}/")
-def get_mailboxes_by_domain(domain):
+def get_mailboxes_by_domain(domain: str):
     """Get list of mailboxes filtered by domain."""
     with db_session() as session:
         mailboxes = session.query(Mailbox).filter_by(domain=domain).all()
     return mailboxes
 
+
+@app.get("/mailboxes/{domain}/count/")
+def get_count_of_mailboxes_by_domain(domain: str):
+    """Get total count of mailboxes filtered by domain."""
+    with db_session() as session:
+        mailboxes = session.query(Mailbox).filter_by(domain=domain).count()
+    return mailboxes
 
 @app.get("/aliases/")
 def get_aliases():
