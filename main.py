@@ -1,6 +1,8 @@
+import shutil
+from pathlib import Path
 from typing import Annotated
 
-from fastapi import Depends, FastAPI, Request
+from fastapi import Depends, FastAPI
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
 from database.engine import db_session
@@ -57,7 +59,10 @@ def bulk_create_mailboxes(data: MailboxDataList):
 
 @app.delete("/mailbox/", status_code=204)
 def delete_mailbox(email: str):
-    # TODO delete folder with letters
+    """Remove the mailbox from DB and folder with all emails that belongs to the mailbox."""
+
+    mailbox_folder_path = Path(settings.MAILBOXES_PATH) / email.split("@")[1] / email
+    shutil.rmtree(mailbox_folder_path.absolute())
     with db_session() as session:
         mailbox = session.query(Mailbox).get(email)
         if mailbox:
@@ -72,7 +77,7 @@ def delete_mailbox(email: str):
 
 @app.get("/mailboxes/{domain}/", status_code=200)
 def get_mailboxes_by_domain(domain: str):
-    """Get list of mailboxes filtered by domain."""
+    """Get list of mailboxes filtered by the domain."""
     with db_session() as session:
         mailboxes = session.query(Mailbox).filter_by(domain=domain).all()
     return mailboxes
@@ -80,7 +85,7 @@ def get_mailboxes_by_domain(domain: str):
 
 @app.get("/mailboxes/{domain}/count/", status_code=200)
 def get_count_of_mailboxes_by_domain(domain: str):
-    """Get total count of mailboxes filtered by domain."""
+    """Get a total count of mailboxes filtered by the domain."""
     with db_session() as session:
         mailboxes = session.query(Mailbox).filter_by(domain=domain).count()
     return mailboxes

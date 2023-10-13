@@ -6,11 +6,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-env = Env()
-env.read_env()
-SQLALCHEMY_DATABASE_URL = env.str("DB_URL")
+from settings import Settings
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+settings = Settings()
+print(settings.SQLALCHEMY_DATABASE_URL)
+
+engine = create_engine(settings.SQLALCHEMY_DATABASE_URL)
 Base = declarative_base()
 
 Session = sessionmaker()
