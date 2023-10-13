@@ -1,7 +1,7 @@
 from typing import Annotated
 
-from fastapi import Depends, FastAPI
-from fastapi.security import HTTPBasic,HTTPBasicCredentials
+from fastapi import Depends, FastAPI, Request
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
 from database.engine import db_session
 from database.models import Mailbox, Alias
@@ -25,8 +25,7 @@ def read_current_user(credentials: Annotated[HTTPBasicCredentials, Depends(secur
     return {"username": credentials.username, "password": credentials.password}
 
 
-
-@app.get("/mailbox/")
+@app.get("/mailbox/", status_code=200)
 def get_mailboxes():
     """Get list of all mailboxes"""
     with db_session() as session:
@@ -34,7 +33,7 @@ def get_mailboxes():
     return mailboxes
 
 
-@app.post("/mailbox/")
+@app.post("/mailbox/", status_code=201)
 def create_mailbox(data: MailboxData):
     """Create mailbox."""
 
@@ -48,7 +47,7 @@ def create_mailbox(data: MailboxData):
         return mailbox
 
 
-@app.post("/mailbox/bulk_create/")
+@app.post("/mailbox/bulk_create/", status_code=201)
 def bulk_create_mailboxes(data: MailboxDataList):
     with db_session() as session:
         for mailbox in data.mailboxes:
@@ -56,7 +55,7 @@ def bulk_create_mailboxes(data: MailboxDataList):
     return data.mailboxes
 
 
-@app.delete("/mailbox/")
+@app.delete("/mailbox/", status_code=204)
 def delete_mailbox(email: str):
     # TODO delete folder with letters
     with db_session() as session:
@@ -71,7 +70,7 @@ def delete_mailbox(email: str):
         return {}
 
 
-@app.get("/mailboxes/{domain}/")
+@app.get("/mailboxes/{domain}/", status_code=200)
 def get_mailboxes_by_domain(domain: str):
     """Get list of mailboxes filtered by domain."""
     with db_session() as session:
@@ -79,14 +78,15 @@ def get_mailboxes_by_domain(domain: str):
     return mailboxes
 
 
-@app.get("/mailboxes/{domain}/count/")
+@app.get("/mailboxes/{domain}/count/", status_code=200)
 def get_count_of_mailboxes_by_domain(domain: str):
     """Get total count of mailboxes filtered by domain."""
     with db_session() as session:
         mailboxes = session.query(Mailbox).filter_by(domain=domain).count()
     return mailboxes
 
-@app.get("/aliases/")
+
+@app.get("/aliases/", status_code=200)
 def get_aliases():
     with db_session() as session:
         aliases = session.query(Alias).all()
