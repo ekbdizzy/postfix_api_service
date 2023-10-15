@@ -1,6 +1,8 @@
 import shutil
 from pathlib import Path
 from typing import Annotated
+from itertools import chain
+import sqlalchemy
 
 from fastapi import Depends, FastAPI
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
@@ -52,7 +54,15 @@ def create_mailbox(data: MailboxData):
 @app.post("/mailbox/bulk_create/", status_code=201)
 def bulk_create_mailboxes(data: MailboxDataList):
     with db_session() as session:
+
+        domain = data.mailboxes[0].domain
+        query = sqlalchemy.text(f"SELECT local_part FROM mailbox WHERE domain = '{domain}'")
+        cursor = session.execute(query).cursor
+        current_mailboxes = list(chain(*cursor.fetchall()))
+
         for mailbox in data.mailboxes:
+            if mailbox.username in current_mailboxes:
+                continue
             utils.create_mailbox(session, mailbox)
     return data.mailboxes
 
